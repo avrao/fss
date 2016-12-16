@@ -1,0 +1,760 @@
+@import
+	url(https://fonts.googleapis.com/css?family=Roboto:400,300,400italic,500,500italic,700,700italic,300italic)
+	;
+
+html, body {
+	height: 100%;
+	width: 100%;
+	overflow-x: auto;
+	font-family: Roboto, sans-serif;
+	font-size: 12px;
+	font-weight: 400;
+}
+
+@media ( min-width : 1440px) {
+	.iv-container {
+		width: 1410px;
+		content: " ";
+	}
+}
+
+@media ( min-width : 1200px) .iv-container {
+	width
+	:
+	 
+	1170
+	px
+	;
+	
+
+}
+
+@media ( min-width : 992px) .iv-container {
+	width
+	:
+	 
+	970
+	px
+	;
+	
+
+}
+
+@media ( min-width : 768px) .container {
+	width
+	:
+	 
+	750
+	px
+	;
+	
+
+}
+
+.iv-container {
+	padding-right: 15px;
+	padding-left: 15px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.iv-view-title {
+	color: black;
+	font-size: 25px;
+	font-weight:400 !important;
+	padding: 15px 0;
+	margin: 0;
+}
+
+/*overide Bootstrap's padding for columns*/
+.col-xs-1, .col-sm-1, .col-md-1, .col-lg-1, .col-xs-2, .col-sm-2,
+	.col-md-2, .col-lg-2, .col-xs-3, .col-sm-3, .col-md-3, .col-lg-3,
+	.col-xs-4, .col-sm-4, .col-md-4, .col-lg-4, .col-xs-5, .col-sm-5,
+	.col-md-5, .col-lg-5, .col-xs-6, .col-sm-6, .col-md-6, .col-lg-6,
+	.col-xs-7, .col-sm-7, .col-md-7, .col-lg-7, .col-xs-8, .col-sm-8,
+	.col-md-8, .col-lg-8, .col-xs-9, .col-sm-9, .col-md-9, .col-lg-9,
+	.col-xs-10, .col-sm-10, .col-md-10, .col-lg-10, .col-xs-11, .col-sm-11,
+	.col-md-11, .col-lg-11, .col-xs-12, .col-sm-12, .col-md-12, .col-lg-12
+	{
+	padding-right: 0;
+	padding-left: 0;
+}
+/*overide Bootstrap's margin for rows*/
+.row {
+	margin-left: 0;
+	margin-right: 0;
+}
+
+#spmTableEtoE_wrapper {
+	width: calc(100% - 2px)
+}
+
+.filter-area-toggle {
+	right: 15px;
+	margin-top:15px;
+}
+.filter-area-toggle.showing-filters{
+	/*border-radius: 8px 8px 0 0;*/
+	border-radius: 8px;
+	
+}
+
+div#header {
+	height: 80px;
+}
+
+.filter_wrapper {
+	padding: 10px;
+	/*border: 1px solid #96BBDE;*/
+}
+
+.headerTemplate {
+	width: 100%;
+	height: 50px;
+	background: #082749;
+	background: -moz-linear-gradient(top, #092e56 0, #08274a 100%);
+	background: -webkit-linear-gradient(top, #092e56 0, #08274a 100%);
+	background: linear-gradient(to bottom, #092e56 0, #08274a 100%);
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 9;
+	margin-left: auto;
+	margin-right: auto;
+	padding: 0;
+}
+
+.headerTemplate .iv-left, .headerTemplate .iv-right {
+	padding: 15px 25px;
+	height: 100%;
+}
+
+input .login {
+	border: 2px red solid;
+}
+
+.nav, .graph {
+	display: inline-block;
+	margin-bottom: 10px;
+	margin-left: 0;
+}
+
+.graph {
+	margin-top: 15px;
+	margin-right: 15px;
+}
+
+.mainFilters {
+	vertical-align: bottom;
+	float: left;
+	padding-right: 40px;
+}
+
+.main-view {
+	clear: both;
+	min-height: 100%;
+}
+
+.main-view:before, .main-view:after {
+	content: "";
+	display: table
+}
+
+.main-view:after {
+	clear: both;
+}
+
+.main_view>div {
+	background-color: #F3F3F3;
+	top: 0;
+	bottom: 0;
+}
+
+.main_view>div button {
+	display: block;
+}
+
+.closePanel {
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.closePanel:hover {
+	color: red;
+}
+
+.menuTrigger {
+	float: left;
+	height: 30px;
+}
+
+.logoutTrigger {
+	float: right;
+	font-size: 20px;
+}
+
+.menuTrigger, .logoutTrigger {
+	cursor: pointer;
+}
+
+.menuTrigger:hover, .logoutTrigger:hover {
+	color: #000;
+}
+
+.menuGlyphicon {
+	font-size: 1em;
+	color: #f9f9f9;
+}
+
+#headerTemplate .iv-menu {
+	height: 20px;
+	margin-right: 15px;
+}
+
+#headerTemplate .iv-logo {
+	height: 20px;
+	margin-right: 10px;
+}
+
+.iv-gray {
+	background-color: #F3F3F3;
+}
+
+.iv-white {
+	background-color: white;
+}
+.iv-dark-gray{
+	background-color: #363636;
+}
+#headerTemplate .iv-left>div {
+	display: inline-block;
+}
+#headerTemplate .iv-left .iv-home-link .iv-logo {
+	margin-left:10px;}
+	
+#headerTemplate .iv-home-link:hover {
+	cursor: pointer;
+	opacity: 0.6;
+}
+
+#projectBranding {
+	line-height: 1em;
+	height: 40px;
+	font-weight: 600px;
+}
+
+#projectTitle {
+	font-size: 16px;
+	font-style: italic;
+	color: #F9F9F9;
+	color: white;
+}
+
+#projectSlogan {
+	font-size: 11px;
+	margin-top: 0.3em;
+	color: #F1F1F1;
+}
+
+.menuGlyphicon:hover {
+	opacity: 0.8;
+}
+
+.iv-nav-search-bar ::-webkit-input-placeholder { /* Chrome */
+	color: #eee;
+}
+
+.iv-nav-search-bar:-ms-input-placeholder { /* IE 10+ */
+	color: #eee;
+}
+
+.iv-nav-search-bar::-moz-placeholder { /* Firefox 19+ */
+	color: #eee;
+	opacity: 1;
+}
+
+.iv-nav-search-bar:-moz-placeholder { /* Firefox 4 - 18 */
+	color: #eee;
+	opacity: 1;
+}
+
+#overlay {
+	z-index: 2000;
+	top: 50%;
+}
+
+#spmUnderlay {
+	background: rgb(219, 208, 208, 0.4);
+}
+
+.btn[disabled] {
+	opacity: 0.3;
+}
+
+#iv-wheelOverlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 2000;
+	background: rgba(0, 0, 0, .5);
+}
+
+#iv-wheelOverlay .iv-load-container {
+	background-color: transparent;
+	width: 90px;
+	padding: 0;
+	position: absolute;
+	top: calc(50% - 100px);
+	left: calc(50% - 45px);
+}
+
+#iv-wheelOverlay .iv-outside-container {
+	position: relative;
+	width: 90px;
+	height: 90px;
+	background-color: transparent;
+	border-radius: 50%;
+	border: 20px solid #E2DFE6;
+}
+
+#iv-wheelOverlay .iv-inside-spinner {
+	position: relative;
+	top: 0;
+	left: 0;
+	width: 50px;
+	height: 50px;
+	background-color: transparent;
+	border-radius: 100%;
+	border-bottom: 10px solid #337ab7;
+	border-top: 10px solid transparent;
+	border-right: 10px solid transparent;
+	border-left: 10px solid transparent;
+	-webkit-animation: spin 1s linear infinite;
+	/* Chrome, Opera 15+, Safari 5+ */
+	/*
+    -moz-animation: spin 1s linear infinite;
+    -o-animation: spin 1s linear infinite;*/
+	animation: spin 1s linear infinite;
+	/* Chrome, Firefox 16+, IE 10+, Opera */
+}
+
+@-webkit-keyframes spin {to { -webkit-transform:rotate(360deg);
+	
+}
+
+} 
+/*
+@-moz-keyframes spin {
+    to {
+        -moz-transform: rotate(360deg);
+    }
+}
+@-o-keyframes spin {
+    to {
+        -o-transform: rotate(360deg);
+    }
+}*/
+
+@keyframes spin {to { transform:rotate(360deg);
+	
+}
+
+}
+
+#iv-wheelOverlay #iv-loading-message {
+	font-size: 20px;
+	color: white;
+	text-align: center;
+}
+
+@-webkit-keyframes spin2 {to { -webkit-transform:rotate(-360deg);
+	
+}
+
+} /*
+@-moz-keyframes spin {
+    to {
+        -moz-transform: rotate(360deg);
+    }
+}
+@-o-keyframes spin {
+    to {
+        -o-transform: rotate(360deg);
+    }
+}*/
+@keyframes spin2 {to { transform:rotate(-360deg);
+	
+}
+
+}
+
+#iv-wheelOverlay .iv-outside-spinner {
+	position: absolute;
+	top: -20px;
+	left: -20px;
+	width: 90px;
+	height: 90px;
+	background-color: transparent;
+	border-radius: 100%;
+	border-bottom: 10px solid red;
+	border-top: 10px solid transparent;
+	border-right: 10px solid transparent;
+	border-left: 10px solid transparent;
+	-webkit-animation: spin2 1s linear infinite;
+	/* Chrome, Opera 15+, Safari 5+ */
+	/*
+    -moz-animation: spin2 1s linear infinite;
+    -o-animation: spin2 1s linear infinite;
+	ms-animation: spin2 1s linear infinite;*/
+	animation: spin2 1s linear infinite;
+	/* Chrome, Firefox 16+, IE 10+, Opera */
+}
+
+
+.form-signin {
+	max-width: 380px;
+	padding: 15px 35px 45px;
+	margin: 10px auto;
+	margin-bottom: 5px;
+	color:white;
+}
+.form-signin .form-signin-heading{
+	font-size:24px;
+}
+.iv-reflection {
+	width: 100%;
+	max-width: 380px;
+	height: 50px;
+	border: 1px solid rgba(0, 0, 0, 0.1);
+	border-bottom: none;
+	background-color: blue;
+	margin-top: 0px;
+	margin-bottom: 40px;
+	background-image: linear-gradient(to bottom, #fff, #F3F3F3 90%);
+}
+
+.iv-login-wrapper  .iv-login-disclaimer {
+	position: absolute;
+	padding-left: 20px;
+	padding-right: 20px;
+	background: rgba(255,255,255,0.05);
+	color:white;
+	bottom:0;
+}
+.iv-login-wrapper .iv-disclaimer-table{
+	margin:30px;
+}
+.iv-login-wrapper .iv-disclaimer-header{
+	font-size:15px;
+	margin-bottom:5px;
+}
+.iv-login-wrapper .iv-disclaimer-body{
+	font-size:11px;
+}
+.iv-login-wrapper {
+	min-height: 100%;
+	clear: both;
+	background: radial-gradient(ellipse at center, #0a93cf 18%, #0586be 42%, #0068b1 75%, #004ea0 96%, #003787 99%);
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+}
+
+.iv-login-wrapper .row {
+	margin: 0;
+	padding: 0;
+}
+.iv-login-wrapper .login-section{
+	    margin: 5% auto 0;
+}
+.form-signin .form-signin-heading, .form-signin .checkbox {
+	margin-bottom: 30px;
+}
+
+.form-signin .checkbox {
+	font-weight: normal;
+}
+
+.form-signin .form-control {
+	position: relative;
+	font-size: 16px;
+	height: auto;
+	padding: 10px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+.form-signin .form-control:focus {
+	z-index: 2;
+}
+
+.form-signin img{
+	max-width: 100%;
+    width: 100%;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.3);
+    margin-bottom: 60px;
+}
+.form-signin input[type="text"] {
+	/* margin-bottom: -1px; */
+	/* border-bottom-left-radius: 0;
+	border-bottom-right-radius: 0; */
+	width: 100%;
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    padding: 10px 15px;
+    box-sizing: border-box;
+    border: none;
+    border-radius: 3px;
+    font-weight: 500;
+}
+
+.form-signin input[type="password"] {
+	 width: 100%;
+    margin: 0 0 10px 0;
+    font-size: 14pxem;
+    padding: 10px 15px;
+    box-sizing: border-box;
+    border: none;
+    border-radius: 3px;
+    font-weight: 500;
+}
+.form-signin .btn {
+	font-size:12px;
+	    width: 100%;
+    padding: 9px;
+    border: none;
+    background: #09468a;
+    margin: 3px 0 15px;
+    -webkit-transition: all .2s ease;
+    -moz-transition: all .2s ease;
+    -o-transition: all .2s ease;
+    -ms-transition: all .2s ease;
+    transition: all .2s ease;
+}
+.form-signin .message {
+	color: red;
+}
+.form-signin .form-control.has-error{
+	border:3px solid red;
+}
+#iv-guideOverlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 10;
+	background: rgba(0, 0, 0, .5);
+}
+
+#iv-guideOverlay .iv-load-container {
+	background-color: transparent;
+	min-width: 100%;
+	min-height: 100%;
+	padding: 0;
+	position: absolute;
+}
+
+#nav-toggle {
+	padding-top: 10px;
+}
+
+#nav-toggle span, #nav-toggle span:before, #nav-toggle span:after {
+	cursor: pointer;
+	border-radius: 2px;
+	height: 5px;
+	width: 35px;
+	background: white;
+	position: absolute;
+	display: block;
+	content: '';
+}
+
+#nav-toggle span:before {
+	top: -10px;
+}
+
+#nav-toggle span:after {
+	bottom: -10px;
+}
+
+#nav-toggle span, #nav-toggle span:before, #nav-toggle span:after {
+	transition: all 500ms ease-in-out;
+}
+
+#nav-toggle.active span {
+	background-color: transparent;
+}
+
+#nav-toggle.active span:before, #nav-toggle.active span:after {
+	top: 0;
+}
+
+#nav-toggle.active span:before {
+	transform: rotate(45deg);
+}
+
+#nav-toggle.active span:after {
+	transform: rotate(-45deg);
+}
+
+#headerTemplate .tooltip {
+	display: inline;
+	position: relative;
+}
+
+#headerTemplate .tooltip:hover:after {
+	background: #333;
+	background: rgba(0, 0, 0, .8);
+	border-radius: 5px;
+	bottom: 26px;
+	color: #fff;
+	content: attr(title);
+	left: 20%;
+	padding: 5px 15px;
+	position: absolute;
+	z-index: 98;
+	width: 220px;
+}
+
+#headerTemplate .tooltip:hover:before {
+	border: solid;
+	border-color: #333 transparent;
+	border-width: 6px 6px 0 6px;
+	bottom: 20px;
+	content: "";
+	left: 50%;
+	position: absolute;
+	z-index: 99;
+}
+
+
+@-webkit-keyframes loader {
+0% {
+	 -webkit-transform: scaleY(1);
+	 -webkit-transform: translateY(-10px);
+	 -webkit-transform-origin:top;
+}
+
+50% {
+		-webkit-transform: translateY(30px);
+
+}
+    
+100% {
+		-webkit-transform: translateY(-10px);
+        -webkit-transform: scaleY(-1);
+
+}
+
+
+
+}
+
+@keyframes loader {
+0% {
+	 transform: translateY(-10px);
+	 transform-origin:top;
+}
+    
+50% { 
+        transform: translateY(20px);
+    }
+        
+        
+100% {
+		transform: translateY(-10px);
+}
+
+}
+
+
+
+.iv-oscillation-y{
+	animation: loader 1.5s infinite linear;
+	-webkit-animation: loader 1.5s infinite linear; /* Safari and Chrome */
+	background: url('Lib/ng-walkthrough/icons/Arrow_Icon.png') no-repeat;
+}
+
+
+a.iv-tooltip {color:black; }
+a.iv-tooltip strong {line-height:30px;}
+a.iv-tooltip:hover {text-decoration:none;} 
+a.iv-tooltip span {
+    z-index:10;display:none; padding:14px 20px;
+    margin-top:-30px; margin-left:28px;
+    min-width:100px; line-height:16px;
+}
+a.iv-tooltip:hover span{
+    display:inline; position:absolute; color:#111;
+    border:1px solid #eee; background:white;}
+.callout {z-index:20;position:absolute;top:30px;border:0;left:-12px; background:white}
+    
+/*CSS3 extras*/
+a.iv-tooltip span
+{
+    border-radius:4px;
+    
+}
+.iv-text-cell{
+	text-align:left;
+}
+.iv-number-cell{
+	text-align:right;
+	text-weight:bold;
+}
+.landing-page-wrapper{
+  	min-height: 100%;
+    width:100%;
+    clear: both;
+    background: radial-gradient(ellipse at center, #0a93cf 18%, #0586be 42%, #0068b1 75%, #004ea0 96%, #003787 99%);
+    padding:15px;
+    color:white;
+    overflow-y:auto;
+    position:absolute;
+    	
+}
+
+.landing-page-message{
+	text-align:center;
+	font-size:1.5em;
+	padding-top:100px;
+}
+.landing-page-wrapper .arrow-title{
+	font-size:18px;
+	position:absolute;
+	bottom:-10px;
+	left:70px;
+}
+
+.landing-page-message .title{
+	font-size:28px;
+	margin: 0 50px;
+	padding:20px 0;
+	font-weight:300;
+	border-bottom:1px solid #ccc;
+}
+.landing-page-message .message{
+	font-weight:200;
+	margin-top:30px;
+}
+.landing-page-wrapper .btn{
+    padding: 9px 15px;
+    border: none;
+    background: #09468a;
+    margin: 3px 0 15px;
+    -webkit-transition: all .2s ease;
+    -moz-transition: all .2s ease;
+    -o-transition: all .2s ease;
+    -ms-transition: all .2s ease;
+    transition: all .2s ease;
+}

@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Internal Service Performance Measurement &mdash; Last Mile Diagnostics: QTD Sampled Piece Performance</title>
+
+    <meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	
+    <link rel="stylesheet" type="text/css" href="styles/bootstrap.css"/>
+    <link rel="stylesheet" type="text/css" href="styles/dc.css"/>
+
+	<style>
+	@import
+	url(https://fonts.googleapis.com/css?family=Roboto:400,300,400italic,500,500italic,700,700italic,300italic)
+	;
+
+		body {
+			font-family: Helvetica, Arial, Sans-Serif; 
+		}
+		.dc-chart g.row text {fill: darkblue}
+		.dc-chart g.row rect.deselected + text {fill: #88C}
+
+		#dc-table-scanner-user {
+			width: 100%;
+		}
+		#dc-table-scanner-user tbody tr:nth-child(1) {
+			display: none;
+		}
+		#dc-table-scanner-user thead tr th,
+		#dc-table-scanner-user tbody tr td {
+			padding-left: 1em;
+			padding-right: 1em;
+		}
+		#dc-table-scanner-user tbody tr td:nth-child(6),
+		#dc-table-scanner-user tbody tr td:nth-child(7),
+		#dc-table-scanner-user tbody tr td:nth-child(8) {
+			text-align: right;
+			padding-right: 2.5em;
+		}
+		#dc-table-scanner-user thead tr th {
+			border-top: 3px #ddd solid;
+			border-bottom: 1px #ddd solid;
+			padding-top: 0.5em;
+			padding-bottom: 0.5em;
+		}
+		
+		#please-wait { 
+			position: absolute; 
+			top: 0px; 
+			left: 0px; 
+			height: 100%; 
+			width: 100%; 
+			background-color: rgba(64,64,64,0.8); 
+			cursor: wait;
+		}
+		
+		#please-wait span {
+			position: absolute;
+			background-color: #fff; 
+			opacity: 1.0; 
+			height: 30px;
+			width: 300px;
+			left: 50%;
+			top: 50%;
+			margin-top: -50px;
+			margin-left: -150px;
+			padding: 40px;
+			text-align: center;
+		}
+		h2 img {
+			margin-right: 1em;
+			float: left;
+		} 
+		h2 {
+			font-size: 1.5em;
+			line-height: 1em;
+		} 
+		h2 small {
+			font-size: 0.8em;
+		}
+		.page-header {
+			height: 60px;
+			margin-top: 15px;
+		}
+		#pagetitle {
+			height: 46px;
+			float: left;
+			vertical-align: top;
+			text-align: center;
+		}
+		#record-count, 
+		#date-range 
+		{
+			font-size: 10pt;
+			font-weight: normal;
+		}
+		#record-count span, 
+		#date-range span 
+		{
+			font-weight: bold;
+		}
+		#filterstats {
+			margin-left: 1em;
+			height: 46px;
+			float: right;
+		}
+		.tab-pane {
+			margin-left: 0px;
+		}
+		#uaa-before-delivery-chart,
+		#uaa-at-delivery-zip-chart {
+			display: none;
+		}
+		
+		/* must match chartHeight, chartWidth variables below */
+		div.stack { 
+			width: 225px;
+			height: 280px;
+		}
+		.row {
+			margin-top: 20px;
+		}
+		.stack>div {
+			float: none;
+		} 
+		#tab3 {
+			width: 86%;
+		}
+		
+		/* Sankey */
+	
+		.node rect {
+			cursor: move;
+			fill-opacity: .9;
+			shape-rendering: crispEdges;
+		}
+
+		.node text {
+			pointer-events: none;
+			text-shadow: 0 1px 0 #fff;
+		}
+
+		.link {
+			fill: none;
+			stroke: #000;
+			stroke-opacity: .2;
+		}
+
+		.link:hover {
+			stroke-opacity: .5;
+		}
+		
+		#colorKey {
+			margin-left: 2em;
+		}
+		
+		.wait {
+			cursor: wait;
+		}
+		
+		.dc-chart strong {
+			cursor: default;
+		}
+		
+		.narrative {
+			margin-top: 2em;
+			margin-left: 7%;
+			margin-right: 7%;
+		}
+		#chart11 g.axis.y {
+			visibility: hidden;
+		}
+		.score-box {
+			width: 225px;
+		}
+		.score-box strong {
+			display: block;
+			float: left;
+		}
+		.score-box div {
+			float: left;
+			text-align: center;
+			font-size: 3em;
+			font-weight: bold;
+			padding-top: 0.5em;
+			color: white;
+			text-shadow:#474747 2px 2px 4px;
+			height: 100px;
+			width: 200px;
+			border-radius: 15px;
+			margin-bottom: 15px;
+		}
+		
+		/* Color Key */
+
+		#color-key.dc-chart {
+			float: left;
+			width: 100%;
+			height: 213px;
+			padding-left: 15px;
+			padding-right: 15px;
+			padding-top: 0px;
+		}
+		#color-key div {
+			font-size: 0.85em;
+		}
+		#color-key .row {
+			margin-top: 5px;
+			margin-left: 5px;
+			margin-right: 0px;
+		}
+		#color-key .row span {
+			padding-right: 0px;
+		}
+		.row.no-margin {
+			margin-top: 0px;
+		}
+		div.color-box {
+			height: 20px;
+			width: 20px;
+			border: 1px black solid;
+		}
+		
+		/* Initially hidden */
+		
+		.color-box {
+			display: none;
+		}
+		
+		/* IV Styles */
+		img {
+			vertical-align: middle;
+			border: 0;
+		}
+		.headerTemplate {
+			width: 100%;
+			height: 50px;
+			background: linear-gradient(to bottom, #092e56 0, #08274a 100%);
+			position: fixed;
+			top: 0;
+			left: 0;
+			z-index: 9;
+			margin-left: auto;
+			margin-right: auto;
+			padding: 0;
+			
+			font-weight: 400;
+		}
+		.headerTemplate .iv-left,
+		.headerTemplate .iv-right {
+			padding: 15px 25px;
+			height: 100%;
+			margin-left: 10px;
+		}
+		.pull-left {
+			float: left !important;
+		}
+		#headerTemplate .iv-left>div {
+			display: inline-block;
+		}
+		#headerTemplate .iv-home-link {
+			margin-left: 10px;
+		}
+		#headerTemplate .iv-logo {
+			height: 20px;
+			margin-right: 10px;
+			margin-left: 10px;
+		}
+		#projectBranding {
+			line-height: 1em;
+			height: 40px;
+		}
+		#projectTitle {
+			font-size: 16px;
+			font-style: italic;
+			color: white;
+		}
+		#projectSlogan {
+			font-size: 11px;
+			margin-top: 0.3em;
+			color: #F1F1F1;
+		}
+		
+		.page-header {
+			margin-top: 65px;
+			margin-bottom: 0px;
+		}
+		#pagetitle {
+			margin-left: 40px;
+		}
+		body {
+			font-family: Roboto, sans-serif;
+		}
+		.tabbable {
+			background-color: #F3F3F3;
+			padding: 15px;
+			margin-left: -15px;
+			margin-right: -15px;
+		}
+		
+		#please-wait,
+		.notices { 
+			position: absolute; 
+			top: 0px; 
+			left: 0px; 
+			height: 100%; 
+			width: 100%; 
+			background-color: rgba(64,64,64,0.8); 
+			cursor: wait;
+		}
+		#please-wait span,
+		.notices div {
+			position: absolute;
+			background-color: #fff; 
+			opacity: 1.0; 
+			height: 30px;
+			width: 300px;
+			left: 50%;
+			top: 50%;
+			margin-top: -50px;
+			margin-left: -150px;
+			padding: 40px;
+			text-align: center;
+		}
+		.notices div {
+			border: 5px solid blue;
+			margin-top: -200px;
+			margin-left: -200px;
+			width: 400px;
+			height: 350px;
+			cursor: pointer;
+		}
+		.notices {
+			background-color: rgba(64,64,96,0.8);
+			display:none;
+		}
+		.notices li {
+			text-align: left;
+		}
+		.notices svg {
+			z-index: 2;
+			margin-left: -250px;
+			margin-top: -40px;
+		}
+		.notices h4 {
+			margin-top: -15px;
+		}
+		
+		/* Notice 2 overrides */
+		
+		#notice2 svg {
+			z-index: 2;
+			left: 50%;
+			margin-left: 0px;
+			top: 0px;
+			margin-top: -60px;
+		}
+		#notice2 div p {
+			text-align: left;
+		}
+		#notice2 div {
+			height: 400px;
+			border-color: #f70f13;
+		}
+		#notice2 h4 {
+			margin-top: 30px;
+		}
+
+
+		#pagetitle h2 {
+			margin-top: 0px;
+		}
+	</style> 
+	
+
+</head>
+<body>
+<div class="container-fluid">
+	<div id="headerTemplate" class="headerTemplate">
+		<div class="iv-left pull-left">
+			<div class="iv-home-link">
+				<span>
+					<img class="iv-logo pull-left" alt="United States Postal Service" src="iv-logo.png"/>
+				</span>
+				<div id="projectBranding" class="pull-left">
+					<div id="projectTitle">Informed Visibility</div>
+					<div id="projectSlogan">The single source for all your mail visibility needs.</div>
+				</div>
+			</div>
+		</div>
+	</div>
+			
+	<div class="page-header">
+		<div id="pagetitle">
+			<h2>
+				Internal Service Performance Measurement &mdash; Last Mile Diagnostics <br/><small>QTD Sampled Piece Performance</small>
+			</h2>
+		</div>
+		<div id="filterstats">
+			<div id="date-range"> For scans Quarter-to-date <span id="start-date"></span> to <span id="end-date"></span></div>
+			<div id="record-count"><span id="filter-count"></span> selected out of <span id="total-count"></span> included piece count | <a href="javascript:dc.filterAll();dc.redrawAll();">Reset All</a></div>
+		</div>
+	</div>
+
+	<div class="tabbable">
+		<ul class="nav nav-pills">
+			<li role="presentation" class="active"><a id="tab1btn" href="#tab1" aria-controls="tab1" role="tab" data-toggle="tab" accesskey="i">D<u>i</u>agnostic View</a></li>
+			<li role="presentation"><a id="tab4btn" href="#tab4" aria-controls="tab4" role="tab" data-toggle="tab" accesskey="b"><u>R</u>eport Notes</a></li>
+	  </ul>
+		<div class="tab-content">
+			<div id="tab1" role="tabpanel" class="active tab-pane row">
+			
+				<div class="row">
+					<div class="col-xs-12 col-sm-6 col-md-3">
+						<div class="score-box">
+							<strong>Processing Score</strong> 
+							<div id="part-one-score" onMouseOver="this.title=setScoreToolTip(this.id);return true;"></div>
+						</div>
+					</div>
+					<div class="col-xs-12 col-sm-6 col-md-3">
+						<div class="score-box">
+							<strong>Overall Score</strong> 
+							<div id="last-mile-score" onMouseOver="this.title=setScoreToolTip(this.id);return true;"></div>
+						</div>
+					</div>
+					<div class="col-xs-12 col-sm-6 col-md-3">
+						<div class="row no-margin">
+							<div class="score-box col-xs-12">
+								<strong>Last Mile Impact</strong> 
+								<div id="last-mile-impact" onMouseOver="this.title=setScoreToolTip(this.id);return true;"></div>
+							</div>
+							<div id="chart11" class="dc-chart col-xs-12">
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-12 col-sm-6 col-md-3">
+						<div id="color-key" class="dc-chart">
+							<strong>Color Key</strong>
+							<div class="row">
+								<div class="color-box col-xs-2" style="background-color:#ffffb2"></div><span class="col-xs-10">Last Mile Impact -2 to 0%</span>
+							</div>
+							<div class="row">
+								<div class="color-box col-xs-2" style="background-color:#fecc5c"></div><span class="col-xs-10">Last Mile Impact -10 to -2%</span>
+							</div>
+							<div class="row">
+								<div class="color-box col-xs-2" style="background-color:#fd8d3c"></div><span class="col-xs-10">Last Mile Impact -50 to -10%</span>
+							</div>
+							<div class="row">
+								<div class="color-box col-xs-2" style="background-color:#f03b20"></div><span class="col-xs-10">Last Mile Impact &lt; -50%</span>
+							</div>
+							<div class="row">
+								<span class="col-xs-12">Graphs represent Last Mile Failures</span>
+							</div>
+						</div>
+					</div>
+				</div> <!-- row -->
+				
+				<div class="row">
+					<div class="col-xs-12 col-sm-8 col-md-9 col-lg-10">
+						<div class="row" style="margin-top:0px"> 
+							<div id="chart8" class="dc-chart col-xs-12 col-sm-6 col-md-4 col-lg-3">
+								<strong>Area</strong>
+								<a class="reset" href="javascript:chart8.filterAll();dc.redrawAll();" style="display:none;">reset</a>
+								<div class="clearfix"></div>
+							</div>
+
+							<div id="chart9" class="dc-chart col-xs-12 col-sm-6 col-md-4 col-lg-3">
+								<strong>District</strong>
+									<a class="reset" href="javascript:chart9.filterAll();dc.redrawAll();" style="display:none;">reset</a>
+								<div class="clearfix"></div>
+							</div>
+
+							<div id="chart15" class="dc-chart col-xs-12 col-sm-6 col-md-4 col-lg-3">
+								<strong>MPOO</strong>
+									<a class="reset" href="javascript:chart15.filterAll();dc.redrawAll();" style="display:none;">reset</a>
+								<div class="clearfix"></div>
+							</div>
+
+							<div id="chart7" class="dc-chart col-xs-12 col-sm-6 col-md-4 col-lg-3">
+								<strong>Delivery Unit</strong>
+								<a class="reset" href="javascript:chart7.filterAll();dc.redrawAll();" style="display:none;">reset</a>
+								<div class="clearfix"></div>
+							</div>
+
+							<div id="chart6" class="dc-chart col-xs-12 col-sm-6 col-md-4 col-lg-3">
+								<strong>Destination ZIP Code</strong>
+								<a class="reset" href="javascript:chart6.filterAll();dc.redrawAll();" style="display:none;">reset</a>
+								<div class="clearfix"></div>
+							</div>
+
+							<div id="chart1" class="dc-chart col-xs-12 col-sm-6 col-md-4 col-lg-3">
+								<strong>Mail Class</strong>
+								<a class="reset" href="javascript:chart1.filterAll();dc.redrawAll();" style="display:none;">reset</a>
+								<div class="clearfix"></div>
+							</div>
+
+							<div id="chart2" class="dc-chart col-xs-12 col-sm-6 col-md-4 col-lg-3">
+								<strong>Mail Category</strong>
+								<a class="reset" href="javascript:chart2.filterAll();dc.redrawAll();" style="display:none;">reset</a>
+								<div class="clearfix"></div>
+							</div>
+						
+							<div id="chart4" class="dc-chart col-xs-12 col-sm-6 col-md-4 col-lg-3">
+								<strong>FSS Zone</strong>
+								<a class="reset" href="javascript:chart4.filterAll();dc.redrawAll();" style="display:none;">reset</a>
+								<div class="clearfix"></div>
+							</div>
+						
+							<div id="chart12" class="dc-chart col-xs-12 col-sm-6 col-md-4 col-lg-3">
+								<strong>MPE Last Proc Op</strong>
+								<a class="reset" href="javascript:chart12.filterAll();dc.redrawAll();" style="display:none;">reset</a>
+								<div class="clearfix"></div>
+							</div>
+						
+							<div id="chart13" class="dc-chart col-xs-12 col-sm-6 col-md-4 col-lg-3">
+								<strong>Last Visibility Scan</strong>
+								<a class="reset" href="javascript:chart13.filterAll();dc.redrawAll();" style="display:none;">reset</a>
+								<div class="clearfix"></div>
+							</div>
+							
+							<div id="chart16" style="display:none" class="dc-chart col-xs-12 col-sm-6 col-md-4 col-lg-3">
+								<strong>Sample Type</strong>
+								<a class="reset" href="javascript:chart16.filterAll();dc.redrawAll();" style="display:none;">reset</a>
+								<div class="clearfix"></div>
+							</div>
+							
+							<div id="chart17" style="display:none" class="dc-chart col-xs-12 col-sm-6 col-md-4 col-lg-3">
+								<strong>In Office Indicator</strong>
+								<a class="reset" href="javascript:chart17.filterAll();dc.redrawAll();" style="display:none;">reset</a>
+								<div class="clearfix"></div>
+							</div>
+							
+						</div>
+					</div>
+					<div class="col-xs-12 col-sm-4 col-md-3 col-lg-2">
+						
+						<div id="chart5" style="display:none" class="dc-chart col-xs-12">
+							<strong>AMS ZIP+4 Route</strong>
+							<form id="routeIDForm">
+								<input type="text" id="routeID" size="8" maxlength="8" />
+								<br/>
+							</form>
+							<a class="reset" href="javascript:chart5.filterAll();dc.redrawAll();" style="display:none;">reset</a>
+							<div class="clearfix"></div>
+						</div>
+					</div>
+				
+				</div> <!-- row -->
+			
+			</div> <!-- tab1 -->
+		
+		<div id="tab4" role="tabpanel" class="tab-pane row">
+				<div class="col-lg-2"></div>
+				<div class="narrative col-lg-8">
+					<h4>Report Notes</h4>
+					<br/>
+					<div>
+<p>This tool provides insight into Last Mile failures by location for the current Quarter to Date (QTD). A Last Mile failure is a mailpiece that received its last processing operation event on time, resulting in an Anticipated Delivery Date that is on or prior to its Expected Delivery Date, but that piece&rsquo;s delivered event occurred after the Expected Delivery Date.</p>
+<p>The tool leverages information gained from service performance measurement (SPM) sampling to provide insight into Last Mile failures. The tool breaks down Last Mile failures by several attributes, including geographical location, mail class, and mail category. You can filter the data on these attributes for further insight.</p>
+<p></p>
+<p></p>
+<p><em>Using the Tool</em></p>
+<p>The top area displays the summary Processing Score, Overall Score, and Last Mile Impact for the mailpieces included in the selected filters. The upper-right corner displays the time period of the data as well as the number of pieces displayed based on the currently selected filters and the total included piece count.</p>
+<p>The graphs display Last Mile Impact data by various attributes for up to 11 categories or locations with the highest number of failed pieces. If there are more than 11 categories or locations for an attribute, the remaining categories or locations are grouped into an &ldquo;Others&rdquo; bar at the bottom of the graph. The bars on the graphs represent Last Mile failures, with the length of the bar representing the number of failed pieces and the color of the bar representing the size of the Last Mile Impact. The darker the color, the greater the Last Mile Impact.</p>
+<p>The bars are displayed in descending order from the top according to the number of failed pieces. The bars on the graphs serve as filters. Clicking a bar filters that graph and the other graphs to display data according to that filter. Multi-select is available. Click an additional bar on the same graph to select an additional location or category to include in the filter.</p>
+<p>Selections on the District, MPOO, Delivery Unit, or Destination ZIP Code graphs within <strong>one</strong> District will display three additional graphs: Route, Sample Type and In Office Indicator. Selections of location on any of these graphs which result in more than one District being selected causes the three additional graphs to not display. These graphs have filter functionality between each other, but will not affect the other graphs. The Route graph has a text filter field. Any text typed in this field will act as a filter on the Route graph. Only those routes that have a substring which matches the filter text will be displayed.</p>
+<p>To reset filters on one of the graphs, click <strong>reset</strong> next to the graph label OR click each of the selected bars on the graph to de-select them. To reset filters on all of the graphs at the same time, click <strong>Reset All</strong> in the upper-right corner of the screen. Clicking here resets all of the filters to the default view.</p>
+<p><em>Additional Information</em></p>
+<p>&middot; The data in the tool comes from the Informed Visibility (IV) system and is updated daily, Monday through Friday.</p>
+<p>&middot; Toward the end of the quarter, performance of the tool may be slower due to the amount of data being processed.</p>
+<p>&middot; There is a known issue where clicking the &ldquo;Others&rdquo; bar on a graph causes the tool to become unresponsive. The team is investigating a solution.</p>
+<p>&middot; If you have any questions or need assistance, please contact the IV Tier 1 Help Desk at 1-800-USPS-HELP. When prompted, say &ldquo;Technical Assistance.&rdquo; When asked to select an application, system, or product, say &ldquo;Informed Visibility.&rdquo; Press <strong>1</strong> to select the option for Service Performance Measurement.</p>
+</div>
+					<br/>
+					
+				</div>
+				<div class="col-lg-2"></div>
+			</div> <!-- tab 4: Business Rules -->
+		</div> <!-- tab-content -->
+	</div> <!-- tabbable -->
+
+	<div id="please-wait">
+		<span>Loading: Please wait...</span>
+	</div>
+
+	<div id="notice1" class="notices" onclick="javscript:clearNotice('#notice1');showNotice('#notice2',15);">
+		<div>
+			<svg
+			   xmlns:dc="http://purl.org/dc/elements/1.1/"
+			   xmlns:cc="http://creativecommons.org/ns#"
+			   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+			   xmlns:svg="http://www.w3.org/2000/svg"
+			   xmlns="http://www.w3.org/2000/svg"
+			   version="1.1"
+			   width="132.63339"
+			   height="76.722794"
+			   id="svg2">
+			  <defs
+				 id="defs4" />
+			  <metadata
+				 id="metadata7">
+				<rdf:RDF>
+				  <cc:Work
+					 rdf:about="">
+					<dc:format>image/svg+xml</dc:format>
+					<dc:type
+					   rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+					<dc:title></dc:title>
+				  </cc:Work>
+				</rdf:RDF>
+			  </metadata>
+			  <g
+				 transform="translate(-112.44586,-258.2451)"
+				 id="layer1">
+				<g
+				   id="g3776">
+				  <path
+					 d="m 189.48418,274.78978 -11.38585,16.96681 16.01775,12.6863 -20.36416,1.67682 0.0683,20.43296 -14.00782,-14.87586 -15.93252,12.79318 2.89668,-20.22671 -19.93587,-4.48012 17.61992,-10.34644 -8.92711,-18.3798 19.07501,7.32492 8.80395,-18.43912 6.16622,19.48046 z"
+					 transform="matrix(1.8404894,-0.58099447,0.29185065,0.92453205,-204.85278,116.3489)"
+					 id="path2985"
+					 style="fill:#faff33;fill-opacity:1;stroke:#130fca;stroke-width:1.51180458;stroke-linecap:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+				  <g
+					 transform="matrix(0.9536143,-0.30103116,0.30103116,0.9536143,0,0)"
+					 id="text2987"
+					 style="font-size:10px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#130fca;fill-opacity:1;stroke:none;font-family:Sans">
+					<path
+					   d="m 68.467339,326.81439 -1.371094,0.59766 -1.40625,10.29199 1.986328,0.79102 -4.59668,0.36035 -6.389648,-9.08789 2.197265,8.24414 2.320313,1.27441 -9.808594,-0.91406 1.494141,-1.01074 0.632812,-9.68555 -2.126953,-0.86133 7.382813,-1.0459 4.517578,9.83496 -0.791016,-8.53418 -1.423828,-0.958 z"
+					   id="path3768"
+					   style="font-size:18px;font-variant:normal;font-stretch:normal;fill:#130fca;font-family:Snap ITC;-inkscape-font-specification:Snap ITC" />
+					<path
+					   d="m 82.529839,333.35345 -0.791016,5.80957 -14.475586,-0.63281 3.805664,-1.32715 -1.353516,-9.65039 -2.452148,-0.94922 13.772461,-0.94043 0.861328,4.03418 -1.432617,-1.47656 -4.236328,0.0176 -0.641602,2.68066 3.023438,-0.70312 0.896484,-1.37988 0.342773,6.08203 -0.958007,-1.51172 -2.680664,-0.36035 -1.063477,2.85644 5.044922,0.63282 z"
+					   id="path3770"
+					   style="font-size:18px;font-variant:normal;font-stretch:normal;fill:#130fca;font-family:Snap ITC;-inkscape-font-specification:Snap ITC" />
+					<path
+					   d="m 102.63042,327.0517 -1.78418,0.82617 -3.278316,9.66797 2.434566,0.62402 -6.767573,1.26563 -2.021485,-5.18555 -2.065429,4.64062 -5.238282,-0.28125 1.78418,-0.73828 -1.423828,-10.37109 -1.617188,-0.75586 9.158204,-0.80859 -2.109375,1.29199 -1.291993,7.72558 4.209961,-6.14355 2.698242,6.07324 0.395508,-7.4707 -1.810547,-0.94043 z"
+					   id="path3772"
+					   style="font-size:18px;font-variant:normal;font-stretch:normal;fill:#130fca;font-family:Snap ITC;-inkscape-font-specification:Snap ITC" />
+					<path
+					   d="m 110.3648,337.51068 c -1e-5,0.42774 -0.30323,0.76172 -0.90967,1.00195 -0.60645,0.24024 -1.46045,0.36036 -2.56201,0.36036 -1.00196,0 -1.82227,-0.13038 -2.46094,-0.39112 -0.63867,-0.26074 -0.95801,-0.58447 -0.95801,-0.97119 0,-0.42773 0.31055,-0.77197 0.93165,-1.03271 0.62109,-0.26074 1.45019,-0.39111 2.4873,-0.39112 1.04882,10e-6 1.88964,0.13184 2.52246,0.39551 0.6328,0.26367 0.94921,0.60645 0.94922,1.02832 z m 3.07617,-11.54004 -3.24316,0.66797 -1.56446,7.45313 1.96875,1.03711 -6.96972,0.25488 1.40625,-1.3711 -0.68555,-7.16308 -2.50488,-1.36231 z"
+					   id="path3774"
+					   style="font-size:18px;font-variant:normal;font-stretch:normal;fill:#130fca;font-family:Snap ITC;-inkscape-font-specification:Snap ITC" />
+				  </g>
+				</g>
+			  </g>
+			</svg> 
+			<h4>Check out new features!</h4>
+			<ul>
+				<li>New graphs; Route Number, Sample Type, and In Office Indicator, will display upon selections of District, MPOO, Delivery Unit, or Destination ZIP Code graphs within one District.</li>
+				<li>Text Filter on Route Number graph - any text typed in this field will act as a filter. Example: Type in “B” and only routes containing the letter B will display.</li>
+			</ul>
+			<p><em>Same great features as previous version!</em></p>
+			<p><small>(Click anywhere to continue.)</small></p>
+		</div>
+	</div>
+	
+	<div id="notice2" class="notices" onclick="javscript:clearNotice('#notice2');">
+		<div>
+			<svg
+			   xmlns:svg="http://www.w3.org/2000/svg"
+			   xmlns="http://www.w3.org/2000/svg"
+			   version="1.1"
+			   width="141.53334"
+			   height="79.118095"
+			   id="svg2">
+			  <defs
+				 id="defs4" />
+			  <g
+				 transform="translate(-38.459999,-225.786)"
+				 id="layer1">
+				<rect
+				   width="136.53334"
+				   height="74.118095"
+				   rx="11.702857"
+				   ry="7.8019047"
+				   x="40.959999"
+				   y="228.286"
+				   id="rect2985"
+				   style="fill:#ffffff;fill-opacity:1;stroke:#f70f13;stroke-width:5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+				<text
+				   x="140.95857"
+				   y="203.30322"
+				   transform="scale(0.76901085,1.3003718)"
+				   id="text3755"
+				   xml:space="preserve"
+				   style="font-size:7.69010782px;font-style:normal;font-weight:normal;line-height:80.00000119%;letter-spacing:0px;word-spacing:0px;fill:#f70f13;fill-opacity:1;stroke:none;font-family:Sans"><tspan
+					 x="140.95857"
+					 y="203.30322"
+					 id="tspan3757"
+					 style="font-size:27.68438911px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:80.00000119%;writing-mode:lr-tb;text-anchor:middle;fill:#f70f13;fill-opacity:1;font-family:Stencil;-inkscape-font-specification:Stencil">IMPORTANT</tspan><tspan
+					 x="140.95857"
+					 y="225.45073"
+					 id="tspan3759"
+					 style="font-size:27.68438911px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:80.00000119%;writing-mode:lr-tb;text-anchor:middle;fill:#f70f13;fill-opacity:1;font-family:Stencil;-inkscape-font-specification:Stencil">NOTICE</tspan></text>
+			  </g>
+			</svg>
+			<h4>Changes to MPOO and Route</h4>
+			<p><strong>MPOO</strong> &mdash; A change has been made to align data with active MPOOs</p>
+			<p><strong>Route</strong> &mdash; Previously data for Route was reported based on how a user set up the scanner. Now the AMS ZIP+4 Route will be used. As a result, mail pieces will be attributed to the AMS ZIP+4 destination route. </p>
+			<p><small>(Click anywhere to continue.)</small></p>
+		</div>
+	</div>
+	
+	
+</div> <!-- container-fluid -->
+
+	
+
+<script type="text/javascript" src="jscripts/jquery.js"></script>
+<script type="text/javascript" src="jscripts/bootstrap.js"></script>
+<script type="text/javascript" src="jscripts/d3.min.js"></script>
+<script type="text/javascript" src="jscripts/crossfilter.js"></script>
+<script type="text/javascript" src="jscripts/dc.js"></script>
+<script>
+	var notices = {"#notice1": {timeout: null, shouldRun: true}, "#notice2": {timeout: null, shouldRun: true}};
+	function showNotice(id, secs) {
+		if (notices[id].timeout) { 
+			clearTimeout(notices[id].timeout); 
+		}
+		if (notices[id].shouldRun) {
+			$(id).css('display','block');
+			notices[id].timeout = setTimeout(function() {$(id).css('display','none');notices[id].shouldRun=false;}, secs * 1000);
+		}
+	}
+	function clearNotice(id) {
+		if (notices[id].timeout) { 
+			clearTimeout(notices[id].timeout); 
+		}
+		$(id).css('display','none');
+		notices[id].shouldRun=false;
+	}
+
+	var chartWidth  = 225;
+	var chartHeight = 280;
+
+	// Color Brewer: 
+	var cbColorRange = ["#f03b20","#fd8d3c","#fecc5c","#ffffb2","#abd9e9"];
+	function cbColor() { return d3.scale.threshold().domain([-0.5,-0.1,-0.02,0.0]).range(cbColorRange);}
+
+	var dateFormat  = d3.time.format('%Y-%m-%d');
+	var dateFormat2 = d3.time.format('%m/%d/%Y');
+	var timestampFormat = d3.time.format('%m/%d/%Y %H:%M');
+	var numFormat = d3.format(',d');
+	var floatFormat = d3.format(".2f");
+	var pctFormat  = d3.format(",.1%");
+	var dayHourFormat = function(h) { return Math.round(h/24,0) + "d " + floatFormat(h % 24) + "h"; };
+
+	var recordCount;
+	var chart1,chart2,chart3,chart4,chart5,chart6,chart7,chart8,chart9,chart10, chart16, chart17;
+	
+	// Lookup, hashmaps
+	var areaLookup = new Object();
+	areaLookup["K"] = "CAPITAL METRO";
+	areaLookup["C"] = "EASTERN";
+	areaLookup["J"] = "GREAT LAKES";
+	areaLookup["B"] = "NORTHEAST";
+	areaLookup["F"] = "PACIFIC";
+	areaLookup["G"] = "SOUTHERN";
+	areaLookup["E"] = "WESTERN";
+	
+	var miscLookup = new Object();
+	miscLookup["FC"] = "First Class";
+	miscLookup["PK"] = "Package Services";
+	miscLookup["PE"] = "Periodicals";
+	miscLookup["SP"] = "Single Piece";
+	miscLookup["SM"] = "Standard";
+	miscLookup["C"] = "Card";
+	miscLookup["L"] = "Letter";
+	miscLookup["F"] = "Flat";
+	miscLookup["Y"] = "Yes";
+	miscLookup["N"] = "No";
+
+	var districtLookup = new Object();
+	districtLookup["350"] = "ALABAMA";
+	districtLookup["995"] = "ALASKA";
+	districtLookup["120"] = "ALBANY";
+	districtLookup["250"] = "APPALACHIAN";
+	districtLookup["852"] = "ARIZONA";
+	districtLookup["720"] = "ARKANSAS";
+	districtLookup["300"] = "ATLANTA";
+	districtLookup["210"] = "BALTIMORE";
+	districtLookup["945"] = "BAY-VALLEY";
+	districtLookup["200"] = "CAPITAL";
+	districtLookup["006"] = "CARIBBEAN";
+	districtLookup["604"] = "CENTRAL ILLINOIS";
+	districtLookup["170"] = "CENTRAL PENNSYLVANIA";
+	districtLookup["680"] = "CENTRAL PLAINS";
+	districtLookup["606"] = "CHICAGO";
+	districtLookup["800"] = "COLORADO/WYOMING";
+	districtLookup["060"] = "CONNECTICUT VALLEY";
+	districtLookup["570"] = "DAKOTAS";
+	districtLookup["752"] = "DALLAS";
+	districtLookup["481"] = "DETROIT";
+	districtLookup["760"] = "FT WORTH";
+	districtLookup["630"] = "GATEWAY";
+	districtLookup["020"] = "GREATER BOSTON";
+	districtLookup["460"] = "GREATER INDIANA";
+	districtLookup["493"] = "GREATER MICHIGAN";
+	districtLookup["290"] = "GREATER S CAROLINA";
+	districtLookup["270"] = "GREENSBORO";
+	districtLookup["320"] = "GULF ATLANTIC";
+	districtLookup["500"] = "HAWKEYE";
+	districtLookup["967"] = "HONOLULU";
+	districtLookup["770"] = "HOUSTON";
+	districtLookup["400"] = "KENTUCKIANA";
+	districtLookup["530"] = "LAKELAND";
+	districtLookup["117"] = "LONG ISLAND";
+	districtLookup["900"] = "LOS ANGELES";
+	districtLookup["700"] = "LOUISIANA";
+	districtLookup["640"] = "MID-AMERICA";
+	districtLookup["280"] = "MID-CAROLINAS";
+	districtLookup["390"] = "MISSISSIPPI";
+	districtLookup["890"] = "NEVADA SIERRA";
+	districtLookup["100"] = "NEW YORK";
+	districtLookup["040"] = "NORTHERN NEW ENGLAND";
+	districtLookup["070"] = "NORTHERN NEW JERSEY ";
+	districtLookup["440"] = "NORTHERN OHIO";
+	districtLookup["220"] = "NORTHERN VIRGINIA";
+	districtLookup["553"] = "NORTHLAND";
+	districtLookup["450"] = "OHIO VALLEY";
+	districtLookup["730"] = "OKLAHOMA";
+	districtLookup["190"] = "PHILADELPHIA METROPO";
+	districtLookup["970"] = "PORTLAND";
+	districtLookup["230"] = "RICHMOND";
+	districtLookup["780"] = "RIO GRANDE";
+	districtLookup["956"] = "SACRAMENTO";
+	districtLookup["840"] = "SALT LAKE CITY";
+	districtLookup["920"] = "SAN DIEGO";
+	districtLookup["940"] = "SAN FRANCISCO";
+	districtLookup["926"] = "SANTA ANA";
+	districtLookup["980"] = "SEATTLE";
+	districtLookup["913"] = "SIERRA COASTAL";
+	districtLookup["330"] = "SOUTH FLORIDA";
+	districtLookup["080"] = "SOUTH JERSEY";
+	districtLookup["335"] = "SUNCOAST";
+	districtLookup["370"] = "TENNESSEE";
+	districtLookup["110"] = "TRIBORO";
+	districtLookup["105"] = "WESTCHESTER";
+	districtLookup["140"] = "WESTERN NEW YORK";
+	districtLookup["150"] = "WESTERN PENNSYLVANIA";
+	
+	var routeTypeLookup = new Object();
+	routeTypeLookup["C"] = "City Route";
+	routeTypeLookup["H"] = "Highway Contract Route";
+	routeTypeLookup["R"] = "Rural Route";
+	routeTypeLookup["B"] = "PO Box";
+	//routeTypeLookup["P"] = "P Route";
+	//routeTypeLookup["U"] = "Unknown";
+	
+	var inOfficeIndLookup = new Object();
+	inOfficeIndLookup["Y"] = "Yes";
+	inOfficeIndLookup["N"] = "No";
+	
+	var unitLookup = new Object(); // will be loaded later
+	var mpooLookup = new Object(); // will be loaded later
+	var operationLookup = new Object(); // will be loaded later
+
+	// Add tooltips
+	// TBD
+	
+	// Common functions
+	function createRowChart2(parent, dimension, group, width, height, lookup, numRowCap) {
+		var chart = dc.rowChart(parent);
+		numRowCap = typeof numRowCap !== 'undefined' ? numRowCap : 11;
+		chart.width(width)
+			.height(height)
+			.margins({top: 10, right: 30, bottom: 35, left: 10})
+			.dimension(dimension)
+			.group(group)
+			.elasticX(true)
+			.colors(cbColor())
+			.colorAccessor(function (d) {
+				return (d.others) ? rollupOthers(group, numRowCap).LastMileImpact : d.value.LastMileImpact;
+			})
+			.valueAccessor(function (d) {
+				return (d.others) ? rollupOthers(group, numRowCap).LastMileFailures : d.value.LastMileFailures;
+			})
+			.label(function(d) {
+				var retVal;
+				if (!d.others && d.value.LastMileFailures <= 0)
+					retVal = '';
+				else if (d.others && rollupOthers(group, numRowCap).LastMileFailures <= 0)
+					retVal = '';
+				else if (d.key == '') 
+					retVal = 'N/A';
+				else
+					retVal = (lookup && lookup[d.key]) ? lookup[d.key] : d.key;
+				return retVal;
+			})
+			.title(function(d) {
+				var other = (d.others) ? rollupOthers(group,numRowCap) : null;
+				var key = (lookup && lookup[d.key]) ? lookup[d.key] : d.key;
+				var cnt = (d.others) ? other.LastMileFailures : d.value.LastMileFailures;
+				var tot = (d.others) ? other.Total : d.value.Total;
+				var pct = (d.others) ? other.LastMileImpact : d.value.LastMileImpact;
+				return key + ' \nFailures: ' + numFormat(cnt) + ' \nTotal: ' + numFormat(tot) + ' \nLast Mile Impact: ' + pctFormat(pct);
+			})
+			.rowsCap(numRowCap)
+			.ordering(function(d) {
+				return -d.value.LastMileFailures;
+			})
+			.xAxis().ticks(4).tickFormat(d3.format("s"));
+		return chart;
+	}
+
+	function round(num, n) {
+		return Math.round(Math.pow(n,10) * num) / Math.pow(n,10);
+	}
+
+	function rollupOthers(group, rowCap) {
+		var Total = 0;
+		var LastMileFailures = 0;
+		var ary = group.top(Infinity);
+		for (var i = rowCap; i < ary.length; i++) {
+			Total += ary[i].value.Total;
+			LastMileFailures += ary[i].value.LastMileFailures;
+		}
+		return {LastMileFailures: LastMileFailures, Total: Total, LastMileImpact: round(-1 * LastMileFailures/Total,3)};
+	}
+	
+	function createVolumeByScore2Chart(parent, dimension, group, width, height) {
+		var chart = dc.barChart(parent);
+		chart.width(width)
+			.height(height)
+			.margins({top: 0, right: 30, bottom: 35, left: 10})
+			.dimension(dimension)
+			.group(group)
+			.centerBar(true)
+			.colors(cbColor())
+			.colorAccessor(function (d) {
+				return d.key;
+			})
+			.valueAccessor(function (d) {
+				return Math.abs(d.value);
+			})
+			.elasticY(true)
+			.x(d3.scale.linear().domain([-101,-1]).nice());
+		chart.xAxis().ticks(4).tickFormat(d3.format("s"));
+		chart.yAxis().ticks(0);
+		return chart;
+	}
+
+	function createSimpleDimension(xfilter, attr) {
+		return xfilter.dimension(function (d) {
+			return d[attr];
+		});
+	}
+	
+	function createSimpleSumGroup(dim, attr) {
+		return dim.group().reduceSum(function (d) {
+			return d[attr];
+		});
+	}
+	
+	function createScoreGroup(dimension) {
+		return dimension.group().reduce(
+			function (p,v) {
+				p.Total					+= isNaN(v["INCLUDED PIECE COUNT"]) ? 0 : v["INCLUDED PIECE COUNT"];
+				p.Part1Pass				+= isNaN(v["PART 1 PASS"]) ? 0 : v["PART 1 PASS"];
+				p.Part1LMPass			+= isNaN(v["PART 1 + LM PASS"]) ? 0 : v["PART 1 + LM PASS"];
+				p.LastMileFailures 		+= v.LastMileFailures;
+				p.PartOneScore	= (p.Total == 0) ? 0 : round(p.Part1Pass/p.Total,3);
+				p.LastMileScore = (p.Total == 0) ? 0 : round(p.Part1LMPass/p.Total,3);
+				p.LastMileImpact = round(p.LastMileScore,3) - round(p.PartOneScore,3);
+				return p;
+			},
+			function (p,v) {
+				p.Total					-= isNaN(v["INCLUDED PIECE COUNT"]) ? 0 : v["INCLUDED PIECE COUNT"];
+				p.Part1Pass				-= isNaN(v["PART 1 PASS"]) ? 0 : v["PART 1 PASS"];
+				p.Part1LMPass			-= isNaN(v["PART 1 + LM PASS"]) ? 0 : v["PART 1 + LM PASS"];
+				p.LastMileFailures 		-= v.LastMileFailures;
+				p.PartOneScore	= (p.Total == 0) ? 0 : round(p.Part1Pass/p.Total,3);
+				p.LastMileScore = (p.Total == 0) ? 0 : round(p.Part1LMPass/p.Total,3);
+				p.LastMileImpact = round(p.LastMileScore,3) - round(p.PartOneScore,3);
+				return p;
+			},
+			function () {
+				return {
+					Total : 0,
+					Part1Pass : 0,
+					Part1LMPass : 0,
+					PartOneScore : 0,
+					LastMileScore : 0,
+					LastMileFailures : 0,
+					LastMileImpact : 0
+				}
+			}
+		);
+	}
+	
+	function updateScoreByRoute(data) {
+		var ndx2 = crossfilter(data);
+		var dim = createSimpleDimension(ndx2,"UnitRouteID");
+		var grp = createScoreGroup(dim);
+		var map = new Object();
+		grp.top(Infinity).forEach(function (d) {
+			if (typeof map[d.key] == 'undefined')
+				map[d.key] = Math.floor(100*d.value.LastMileImpact);
+		});
+		data.forEach(function (d) {
+			d.LastMileImpactByRoute = map[d.UnitRouteID];
+		});
+	}
+	
+	// Create crossfilter and default group
+	var ndx = crossfilter();
+	var all = ndx.groupAll();
+	
+	// Create Dimension for each attribute
+	var MailClassCodeDim = createSimpleDimension(ndx,"ML_CL_CODE");
+	var MailCategoryCodeDim = createSimpleDimension(ndx,"ML_CAT_CODE");
+	var FSSZoneDim = createSimpleDimension(ndx,"FSS_ZONE");
+	var DestinationZipDim = createSimpleDimension(ndx,"DESTN_ZIP_5");
+	var DeliveryUnitLocaleKeyDim = createSimpleDimension(ndx,"DU_LCLE_KEY");
+	var AreaNameDim = createSimpleDimension(ndx,"AREA");
+	var DistrictNameDim = createSimpleDimension(ndx,"DISTRICT");
+	var MpooDim = createSimpleDimension(ndx,"MPOOID");
+	var UniversalDim = ndx.dimension(function (d) {
+		return "";
+	});
+	var LastMileImpactByRouteDim = createSimpleDimension(ndx,"LastMileImpactByRoute");
+	var MPELastProcessingOpDim = createSimpleDimension(ndx,"MPE Last Processing Operation");
+	var LastVisibilityScanDim = createSimpleDimension(ndx,"Last Visibility Scan");
+
+	// Create corresponding Group for each Dimension
+	var MailClassCodeGrp = createScoreGroup(MailClassCodeDim);
+	var MailCategoryCodeGrp = createScoreGroup(MailCategoryCodeDim);
+	var FSSZoneGrp = createScoreGroup(FSSZoneDim);
+	var DestinationZipGrp = createScoreGroup(DestinationZipDim);
+	var DeliveryUnitLocaleKeyGrp = createScoreGroup(DeliveryUnitLocaleKeyDim);
+	var AreaNameGrp = createScoreGroup(AreaNameDim);
+	var DistrictNameGrp = createScoreGroup(DistrictNameDim);
+	var MpooGrp = createScoreGroup(MpooDim);
+	var MPELastProcessingOpGrp = createScoreGroup(MPELastProcessingOpDim);
+	var LastVisibilityScanGrp = createScoreGroup(LastVisibilityScanDim);
+
+	var IncludedPieceCountGrp = createSimpleSumGroup(UniversalDim,"Total");
+	var ScoreGrp = createScoreGroup(UniversalDim);
+	var LastMileImpactByRouteGrp = createSimpleSumGroup(LastMileImpactByRouteDim,"LastMileFailures");
+
+
+	// 2nd crossfilter for Route
+	var ndxRoute = crossfilter();
+
+	var RouteIDDim = createSimpleDimension(ndxRoute,"ROUTE_ID");
+	var RouteIDGrp = createScoreGroup(RouteIDDim);
+	var RouteIDFilterDim = createSimpleDimension(ndxRoute,"ROUTE_ID");
+	var RouteTypeDim = createSimpleDimension(ndxRoute,"ROUTE_TYPE"); 
+	var InOfficeIndDim = createSimpleDimension(ndxRoute,"IN_OFFICE_IND");
+	var RouteTypeGrp = createScoreGroup(RouteTypeDim);
+	var InOfficeIndGrp = createScoreGroup(InOfficeIndDim);
+	
+	// Shadow Dimensions and Group for 2nd crossfilter (ndxRoute)
+	// associate these with dimensions on main crossfilter
+	var MailClassCodeDimShadow = createSimpleDimension(ndxRoute,"ML_CL_CODE");
+	var MailCategoryCodeDimShadow = createSimpleDimension(ndxRoute,"ML_CAT_CODE");
+	var FSSZoneDimShadow = createSimpleDimension(ndxRoute,"FSS_ZONE");
+	var DestinationZipDimShadow = createSimpleDimension(ndxRoute,"DESTN_ZIP_5");
+	var DeliveryUnitLocaleKeyDimShadow = createSimpleDimension(ndxRoute,"DU_LCLE_KEY");
+	var MPELastProcessingOpDimShadow = createSimpleDimension(ndxRoute,"MPE Last Processing Operation");
+	var LastVisibilityScanDimShadow = createSimpleDimension(ndxRoute,"Last Visibility Scan");
+	var MpooDimShadow = createSimpleDimension(ndxRoute,"MPOOID");
+	var DistrictNameDimShadow = createSimpleDimension(ndxRoute,"DISTRICT");
+
+	function dimFilteredKeyCount(dimension) {
+		var count = 0;
+		var arry = dimension.group().top(Infinity);
+		if (arry.length > 0) 
+			arry.forEach(function(d){if(d.value > 0) count++;});
+		return count;
+	}
+
+	function dimFilteredKeys(dimension) {
+		var keys = new Array();
+		var arry = dimension.group().top(Infinity);
+		if (arry.length > 0) 
+			arry.forEach(function(d){if(d.value > 0) keys.push(d.key);});
+		return keys;
+	}
+	
+   //begin: route id related ====================
+	
+	function matchingRoutes(group, match) {
+		var routes = new Array();
+		var arry = group.top(Infinity);
+		if (arry.length > 0) {
+			arry.forEach(function(d){
+				if (d.key.indexOf(match) !== -1){
+					routes.push(d.key);
+				}
+			});
+		}
+		return routes;
+	}
+	
+	$('#routeID').keyup(function() {
+		var routeMatches = matchingRoutes(RouteIDGrp, this.value);
+		chart5.filterHandler()(RouteIDFilterDim, routeMatches);
+		chart5.redraw();
+	});
+		
+	//end: route id related ======================
+	
+	function shadowFilterHandler_SAVE(chart, filter){
+		if (typeof chart.shadow !== 'undefined') {
+			chart.shadow.filter(filter);
+		}
+	}
+
+	var currentlyLoadedDistrict = "";
+	
+	function shadowFilterHandler(chart, filter){
+		// If there's a shadow dimension on this chart, apply the same filter to it as well
+		if (typeof chart.shadow !== 'undefined') {
+			chart.filterHandler()(chart.shadow,chart.filters());
+		}
+		// chart9 is the district chart, chart5 is the route chart
+		// if filters() has length 1 or there is only 1 non-zero key on the district dimension
+		// then make the Route chart visible
+		if (chart9.filters().length == 1 || dimFilteredKeys(DistrictNameDim).length == 1) {
+			var districtID = chart9.filters().length == 1 ? chart9.filters()[0] : dimFilteredKeys(DistrictNameDim)[0];
+			// Only load district data if selected district is not already loaded
+			if (currentlyLoadedDistrict !== districtID) {
+				currentlyLoadedDistrict = districtID; // remember the currently loaded district
+				d3.csv('data/D'+ districtID+'.csv', function(data) {
+					data.forEach(processDatum);
+					ndxRoute.add(data);
+					$('#chart5').fadeIn({complete:function() {chart5.render();}});
+					$('#routeID').show();
+					
+					$('#chart16').fadeIn({complete:function() {chart16.render();}});
+					$('#chart17').fadeIn({complete:function() {chart17.render();}});
+				});
+			}
+		} else {
+			$('#chart5').fadeOut(
+				{complete: function() {
+					// unset filters on all shadow dimensions
+					// remove data from 2nd crossfilter
+					// apply chart filters on all shadow dimensions
+					chart1.shadow.filterAll();
+					chart2.shadow.filterAll();
+					chart4.shadow.filterAll();
+					chart6.shadow.filterAll();
+					chart7.shadow.filterAll();
+					chart9.shadow.filterAll();
+					chart12.shadow.filterAll();
+					chart13.shadow.filterAll();
+					chart15.shadow.filterAll();
+					
+					ndxRoute.remove();
+					
+					chart1.filterHandler()(chart1.shadow,chart1.filters());
+					chart2.filterHandler()(chart2.shadow,chart2.filters());
+					chart4.filterHandler()(chart4.shadow,chart4.filters());
+					chart6.filterHandler()(chart6.shadow,chart6.filters());
+					chart7.filterHandler()(chart7.shadow,chart7.filters());
+					chart9.filterHandler()(chart9.shadow,chart9.filters());
+					chart12.filterHandler()(chart12.shadow,chart12.filters());
+					chart13.filterHandler()(chart13.shadow,chart13.filters());
+					chart15.filterHandler()(chart15.shadow,chart15.filters());
+					
+					chart16.filterAll();
+					chart17.filterAll();
+					$('#chart16').hide();
+					$('#chart17').hide();
+					
+					$('#routeID').hide();
+					$('#routeID').val('');
+					RouteIDFilterDim.filterAll();
+					}
+				}
+			);
+			// clear the currently loaded district
+			currentlyLoadedDistrict = "";
+		}
+	}
+
+	function round(num, n) {
+		return Math.round(Math.pow(n,10) * num) / Math.pow(n,10);
+	}
+
+	// Trick for any charts that are capped: change order function on group
+	// only applies to the complex groups that don't just roll up to 'value'.
+	// Note: may need to do this for other (all?) groups with complex roll ups...
+	MailClassCodeGrp.order(function(d) {return d.LastMileFailures;});
+	MailCategoryCodeGrp.order(function(d) {return d.LastMileFailures;});
+	FSSZoneGrp.order(function(d) {return d.LastMileFailures;});
+	RouteIDGrp.order(function(d) {return d.LastMileFailures;});
+	DestinationZipGrp.order(function(d) {return d.LastMileFailures;});
+	DeliveryUnitLocaleKeyGrp.order(function(d) {return d.LastMileFailures;});
+	AreaNameGrp.order(function(d) {return d.LastMileFailures;});
+	DistrictNameGrp.order(function(d) {return d.LastMileFailures;});
+	MpooGrp.order(function(d) {return d.LastMileFailures;});
+	MPELastProcessingOpGrp.order(function(d) {return d.LastMileFailures;});
+	LastVisibilityScanGrp.order(function(d) {return d.LastMileFailures;});
+	
+	function setScoreToolTip(id) {
+		var txt = '';
+		var val = ScoreGrp.top(1)[0].value;
+		if (id === 'part-one-score') {
+			txt  = 'Processing Score';
+			txt += '\nSuccesses: ' + numFormat(val.Part1Pass);
+			txt += '\nFailures: ' + numFormat(val.Total - val.Part1Pass);
+			txt += '\nTotal: ' + numFormat(val.Total);
+			txt += '\nScore: ' + pctFormat(val.PartOneScore);
+		}
+		else if (id === 'last-mile-score') {
+			txt  = 'Overall Score';
+			txt += '\nSuccesses: ' + numFormat(val.Part1LMPass);
+			txt += '\nFailures: ' + numFormat(val.Total - val.Part1LMPass);
+			txt += '\nTotal: ' + numFormat(val.Total);
+			txt += '\nScore: ' + pctFormat(val.LastMileScore);
+		}
+		else if (id === 'last-mile-impact') {
+			txt  = 'Last Mile Impact';
+			txt += '\nFailures: ' + numFormat(val.LastMileFailures);
+			txt += '\nTotal: ' + numFormat(val.Total);
+			txt += '\nImpact: ' + pctFormat(val.LastMileImpact);
+		}
+		return txt;
+	}
+
+	function processDatum(d) {
+		// Force numbers to be interpreted as such and not strings (note leading +)
+		d.SAMPLE_SCANS				= +d.SAMPLE_SCANS;
+		d["INCLUDED PIECE COUNT"]	= +d["INCLUDED PIECE COUNT"];
+		d.Total						= isNaN(d["INCLUDED PIECE COUNT"])?0:d["INCLUDED PIECE COUNT"];
+		d["PART 1 PASS"]			= isNaN(+d["PART 1 PASS"])?0:+d["PART 1 PASS"];
+		d["PART 1 + LM PASS"]		= isNaN(+d["PART 1 + LM PASS"])?0:+d["PART 1 + LM PASS"];
+		
+		// Precalculate Failures
+		d.LastMileFailures = d["PART 1 PASS"] - d["PART 1 + LM PASS"];
+		
+		// Set now, update later
+		d.UnitRouteID = d.DU_LCLE_KEY + "|" + d.DELIVERY_UNIT; //* Rename
+		d.LastMileImpactByRoute = 0;
+		
+		// Special Route Type Handling;
+		if(typeof d.ROUTE_TYPE !== 'undefined'){
+			if(!d.ROUTE_TYPE){
+				d.ROUTE_TYPE = 'B';
+				/* if (d.ROUTE_ID.indexOf('B') !== -1){
+					d.ROUTE_TYPE = 'B';
+				}else
+				if (d.ROUTE_ID.indexOf('P') !== -1){
+					d.ROUTE_TYPE = 'P';
+				}else{
+					d.ROUTE_TYPE = 'U';
+				} */
+			}
+		}
+		
+	}
+					
+	function loadData() {
+		// data file is relative to location of this html file
+		d3.csv('DeliveryUnitDim.csv', function(data) {
+			data.forEach(function(d) {
+				if (typeof unitLookup[d.Name] == 'undefined') {
+					unitLookup[d.Name] = d.Value;
+				}
+			});
+
+			d3.csv('MpooDim.csv', function(data) {
+				data.forEach(function(d) {
+					mpooLookup[d.Code] = d.Name;
+				});
+				
+				d3.csv('OperationDim.csv', function(data) {
+					data.forEach(function(d) {
+						operationLookup[d.Code] = d.Name;
+					});
+					
+					d3.csv('DateRange.csv', function(data) {
+						data.forEach(function(d) {
+							$('#start-date').text(d.StartDate);
+							$('#end-date').text(d.EndDate);
+						});
+					
+						d3.csv('Data.csv', function (data) {
+							// data clean-up: Don't need to modify everything (e.g. strings)
+							data.forEach(processDatum);
+							
+							// Calculate scores by route first
+							updateScoreByRoute(data);
+							
+							// Add cleaned up data to crossfilter object
+							ndx.add(data);
+	
+							// Do remaining work which can only be done after the data is loaded
+							lastStep();
+						}); // Data.csv
+					}); // DateRange.csv
+				}); // OperationDim
+			}); // MpooDim.csv
+		}); // DeliveryUnitDim.csv
+	}
+
+	function lastStep() {
+		
+		// Populate date range of data in the header
+//		$('#start-date').text(dateFormat2(ExpectedScanDateDim.bottom(1)[0].ExpectedScanDate));
+//		$('#end-date').text(dateFormat2(ExpectedScanDateDim.top(1)[0].ExpectedScanDate));
+		
+		// Wire the widget to report on filter selection in the header
+		$('#total-count').text(numFormat(IncludedPieceCountGrp.top(1)[0].value));
+		dc.numberDisplay('#filter-count').group(IncludedPieceCountGrp).formatNumber(numFormat);
+		
+		dc.numberDisplay('#part-one-score').group(ScoreGrp).valueAccessor(function (d) {return d.value.PartOneScore;}).formatNumber(pctFormat);
+		dc.numberDisplay('#last-mile-score').group(ScoreGrp).valueAccessor(function (d) {return d.value.LastMileScore;}).formatNumber(pctFormat);
+		var lastMileScoreChart = dc.numberDisplay('#last-mile-impact').group(ScoreGrp).valueAccessor(function (d) {return d.value.LastMileImpact;}).formatNumber(pctFormat);
+		lastMileScoreChart.on("preRedraw", function(chart) {
+			$('#last-mile-impact').css('background-color', cbColor()(chart.value()));
+		});
+		
+		
+
+		// Create charts
+		chart1 = createRowChart2("#chart1", MailClassCodeDim, MailClassCodeGrp, chartWidth, chartHeight, miscLookup);
+		chart2 = createRowChart2("#chart2", MailCategoryCodeDim, MailCategoryCodeGrp, chartWidth, chartHeight, miscLookup);
+		chart4 = createRowChart2("#chart4", FSSZoneDim, FSSZoneGrp, chartWidth, chartHeight, miscLookup);
+		chart5 = createRowChart2("#chart5", RouteIDDim, RouteIDGrp, chartWidth, chartHeight * 3.2, 0, 50);
+		chart6 = createRowChart2("#chart6", DestinationZipDim, DestinationZipGrp, chartWidth, chartHeight);
+		chart7 = createRowChart2("#chart7", DeliveryUnitLocaleKeyDim, DeliveryUnitLocaleKeyGrp, chartWidth, chartHeight, unitLookup);
+		chart8 = createRowChart2("#chart8", AreaNameDim, AreaNameGrp, chartWidth, chartHeight, areaLookup);
+		chart9 = createRowChart2("#chart9", DistrictNameDim, DistrictNameGrp, chartWidth, chartHeight, districtLookup);
+		chart11 = createVolumeByScore2Chart("#chart11", LastMileImpactByRouteDim, LastMileImpactByRouteGrp, chartWidth, chartHeight * 0.24 );
+		chart12 = createRowChart2("#chart12", MPELastProcessingOpDim, MPELastProcessingOpGrp, chartWidth, chartHeight, operationLookup);
+		chart13 = createRowChart2("#chart13", LastVisibilityScanDim, LastVisibilityScanGrp, chartWidth, chartHeight, operationLookup);
+		chart15 = createRowChart2("#chart15", MpooDim, MpooGrp, chartWidth, chartHeight, mpooLookup);
+		chart16 = createRowChart2("#chart16", RouteTypeDim, RouteTypeGrp, chartWidth, chartHeight, routeTypeLookup);
+		chart17 = createRowChart2("#chart17", InOfficeIndDim, InOfficeIndGrp, chartWidth, chartHeight, inOfficeIndLookup);
+		
+		// Add shadow filter handler to all charts using dimensions
+		// which have shadows
+		chart1.shadow = MailClassCodeDimShadow;
+		chart2.shadow = MailCategoryCodeDimShadow;
+		chart4.shadow = FSSZoneDimShadow;
+		chart6.shadow = DestinationZipDimShadow;
+		chart7.shadow = DeliveryUnitLocaleKeyDimShadow;
+		chart9.shadow = DistrictNameDimShadow;
+		chart12.shadow = MPELastProcessingOpDimShadow;
+		chart13.shadow = LastVisibilityScanDimShadow;
+		chart15.shadow = MpooDimShadow;
+
+		chart1.on("filtered", shadowFilterHandler);
+		chart2.on("filtered", shadowFilterHandler);
+		chart4.on("filtered", shadowFilterHandler);
+		chart6.on("filtered", shadowFilterHandler);
+		chart7.on("filtered", shadowFilterHandler);
+		chart9.on("filtered", shadowFilterHandler);
+		chart12.on("filtered", shadowFilterHandler);
+		chart13.on("filtered", shadowFilterHandler);
+		chart15.on("filtered", shadowFilterHandler);
+		
+		// Commented for now pending route id work: Route chart does not need to be selectable
+		//chart5.filter = function() {};
+		
+		
+		// Render all charts
+		dc.renderAll();
+
+		// Unhide 
+		$('#part-one-score').css("background-color","#abd9e9");
+		$('#last-mile-score').css("background-color","#abd9e9");
+		$('#last-mile-impact').css("background-color","#abd9e9");
+		$('.color-box').css("display","block");
+		
+		// Hack
+		lastMileScoreChart.redraw();
+		
+		// hide the "please wait" panel
+		$('#please-wait').css("display","none");
+		
+		// display the notices panel for 10 seconds if not past expiration date
+		var noticeExpirationDate = new Date('6/3/2016');
+		if ((new Date()) < noticeExpirationDate) {
+			showNotice('#notice1',15);
+			setTimeout(function() { showNotice('#notice2',15); }, 15 * 1000);
+		}
+		
+	}
+	
+	// Do it
+	loadData();
+	
+	// Begin: Prevent form submission with Enter key
+	function stopRKey(evt) { 
+	  var evt = (evt) ? evt : ((event) ? event : null); 
+	  var node = (evt.target) ? evt.target : ((evt.srcElement) ? evt.srcElement : null); 
+	  if ((evt.keyCode == 13) && (node.type=="text"))  {return false;} 
+	} 
+
+	document.onkeypress = stopRKey; 
+	// End: Prevent form submission with Enter key
+	
+	
+</script>
+</body>
+</html>

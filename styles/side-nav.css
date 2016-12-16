@@ -1,0 +1,465 @@
+/*This file is necessary to make the sidebar navigation appear/disappear using transition
+ * Without it, the other components of the page should remain unaffected
+    -Andrei
+*/
+
+/* -------------------------------- 
+
+Primary style
+
+-------------------------------- */
+
+/* -------------------------------- 
+
+Modules - reusable parts of our design
+
+-------------------------------- */
+.overflow-hidden {
+	overflow: hidden;
+}
+
+/* -------------------------------- 
+
+Main components 
+
+-------------------------------- */
+.headerTemplate {
+	/* in app.css: set a min-height and a z-index to be sure that the main element completely covers the lateral menu */
+	/* Force Hardware Acceleration in WebKit */
+	-webkit-transform: translateZ(0);
+	-webkit-backface-visibility: hidden;
+	-webkit-transition-property: -webkit-transform;
+	-moz-transition-property: -moz-transform;
+	transition-property: transform;
+	-webkit-transition-duration: 0.4s;
+	-moz-transition-duration: 0.4s;
+	transition-duration: 0.4s;
+}
+
+#headerTemplate.lateral-menu-is-open {
+	/* translate to show the lateral menu */
+	-webkit-transform: translateX(300px);
+	-moz-transform: translateX(300px);
+	-ms-transform: translateX(300px);
+	-o-transform: translateX(300px);
+	transform: translateX(300px);
+	transition-property: transform;
+	-webkit-transition-duration: 0.4s;
+	-moz-transition-duration: 0.4s;
+	transition-duration: 0.4s;
+}
+
+#header.is-fixed {
+	position: fixed;
+}
+
+@media only screen and (min-width: 768px) {
+	#header {
+		height: 70px;
+	}
+}
+
+.cd-main-content {
+	/* set a min-height and a z-index to be sure that the main element completely covers the lateral menu */
+	position: relative;
+	z-index: 5;
+	/* Force Hardware Acceleration in WebKit */
+	-webkit-transform: translateZ(0);
+	-webkit-backface-visibility: hidden;
+	-webkit-transition-property: -webkit-transform;
+	-moz-transition-property: -moz-transform;
+	transition-property: transform;
+	-webkit-transition-duration: 0.4s;
+	-moz-transition-duration: 0.4s;
+	transition-duration: 0.4s;
+	overflow-y: auto;
+	
+	/* Firefox */
+	height: -moz-calc(100% - 50px);
+	/* WebKit */
+	height: -webkit-calc(100% - 50px);
+	/* Opera */
+	height: -o-calc(100% - 50px);
+	/* Standard */
+	
+	background-color:white;
+	height:100%;
+}
+.cd-main-content.header-is-shown{
+	margin-top: 50px;
+	height: calc(100% - 50px);
+}
+.lateral-menu-is-open {
+	/* translate to show the lateral menu - all content needs to be put in the .cd-main-content to translate*/
+	-webkit-transform: translateX(300px);
+	-moz-transform: translateX(300px);
+	-ms-transform: translateX(300px);
+	-o-transform: translateX(300px);
+	transform: translateX(300px);
+}
+
+@media only screen and (min-width: 768px) {
+	.cd-main-content {
+	}
+}
+
+.cd-main-content.lateral-menu-is-open{
+	z-index:1;
+}
+#cd-menu-trigger {
+	position: absolute;
+	left: 0;
+	top: 0;
+	height: 100%;
+	width: 50px;
+}
+
+#cd-menu-trigger .cd-menu-icon {
+	/* this span is the central line in the menu menu */
+	display: inline-block;
+	position: absolute;
+	left: 0;
+	top: 50%;
+	bottom: auto;
+	-webkit-transform: translateX(-50%) translateY(-50%);
+	-moz-transform: translateX(-50%) translateY(-50%);
+	-ms-transform: translateX(-50%) translateY(-50%);
+	-o-transform: translateX(-50%) translateY(-50%);
+	transform: translateX(-50%) translateY(-50%);
+	width: 18px;
+	height: 2px;
+	background-color: #fff;
+	/* these are the upper and lower lines in the menu menu */
+}
+
+#cd-menu-trigger .cd-menu-icon::before, #cd-menu-trigger .cd-menu-icon:after{
+	content: '';
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	background-color: inherit;
+	left: 0;
+}
+
+#cd-menu-trigger .cd-menu-icon::before {
+	bottom: 5px;
+}
+
+#cd-menu-trigger .cd-menu-icon::after {
+	top: 5px;
+}
+
+#cd-menu-trigger.is-clicked .cd-menu-icon {
+	background-color: rgba(255, 255, 255, 0);
+}
+
+#cd-menu-trigger.is-clicked .cd-menu-icon::before, #cd-menu-trigger.is-clicked .cd-menu-icon::after
+	{
+	background-color: white;
+}
+
+#cd-menu-trigger.is-clicked .cd-menu-icon::before {
+	bottom: 0;
+	-webkit-transform: rotate(45deg);
+	-moz-transform: rotate(45deg);
+	-ms-transform: rotate(45deg);
+	-o-transform: rotate(45deg);
+	transform: rotate(45deg);
+}
+
+#cd-menu-trigger.is-clicked .cd-menu-icon::after {
+	top: 0;
+	-webkit-transform: rotate(-45deg);
+	-moz-transform: rotate(-45deg);
+	-ms-transform: rotate(-45deg);
+	-o-transform: rotate(-45deg);
+	transform: rotate(-45deg);
+}
+
+@media only screen and (min-width: 768px) {
+	#cd-menu-trigger {
+		width: 110px;
+		padding-left: 1.25em;
+	}
+	#cd-menu-trigger .cd-menu-text {
+		display: inline-block;
+		line-height: 70px;
+	}
+	#cd-menu-trigger .cd-menu-icon {
+		left: auto;
+		right: 1.25em;
+		-webkit-transform: translateX(0);
+		-moz-transform: translateX(0);
+		-ms-transform: translateX(0);
+		-o-transform: translateX(0);
+		transform: translateX(0);
+	}
+}
+#iv-top-level-menu{
+	z-index:2
+}
+#iv-bottom-level-menu{
+	z-index:3;
+	top:80px;
+}
+.iv-lateral-nav {
+	position: fixed;
+	height: 100%;
+	left: 0px;
+	top: 0px;
+	visibility: hidden;
+	/* the secondary navigation is covered by the main element */
+	z-index: 1;
+	width: 300px;
+	/*background-color: rgb(8, 42,78)*/;/*#397fc2;*/
+	background-color:rgb(33,88,142);
+	/* Force Hardware Acceleration in WebKit */
+	-webkit-transform: translateZ(-300px);
+	-webkit-backface-visibility: hidden;
+	-webkit-transition: -webkit-transform .4s 0s, visibility 0s .4s;
+	-moz-transition: -moz-transform .4s 0s, visibility 0s .4s;
+	transition: transform .4s 0s, visibility 0s .4s;
+	/* this creates the subtle slide in animation of the navigation */
+	-webkit-transform: translateX(-300px);
+	-moz-transform: translateX(-300px);
+	-ms-transform: translateX(-300px);
+	-o-transform: translateX(-300px);
+	transform: translateX(-300px);
+	padding: 0;
+	overflow-x: hidden;
+}
+
+
+.iv-lateral-nav .cd-navigation {
+	color: rgb(255, 255, 255);
+}
+
+.iv-lateral-nav .cd-navigation>li {
+	width: 100%;
+}
+
+.iv-lateral-nav .sub-menu {
+	width: 100%;
+	margin: 0;
+	padding: 0;
+	width: 300px;
+}
+
+.iv-lateral-nav .sub-menu li {
+	font-size: 14.716px;
+	font-weight: 400;
+	background-color:rgb(8, 42,78); /*#397fc2*/
+	
+}
+.iv-lateral-nav .sub-menu li,.iv-lateral-nav .glyphicon-search:hover {
+	cursor:pointer;
+}
+
+.iv-lateral-nav a {
+	display: block;
+	color: white;
+	line-height: 2em;
+	padding: 2px;
+	/*16px 0 32px;*/
+	text-align: left;
+	font-family: "Arial";
+	text-decoration: none;
+}
+
+.iv-lateral-nav a.current {
+	background-color: #3a4a4d;
+	color: #FFF;
+}
+
+@media only screen and (min-width: 768px) {
+	.iv-lateral-nav .cd-navigation {
+		margin: 0;
+		padding: 0;
+	}
+}
+
+.iv-lateral-nav.lateral-menu-is-open {
+	-webkit-transform: translateX(0);
+	-moz-transform: translateX(0);
+	-ms-transform: translateX(0);
+	-o-transform: translateX(0);
+	transform: translateX(0);
+	visibility: visible;
+	-webkit-transition: -webkit-transform .4s 0s, visibility 0s 0s;
+	-moz-transition: -moz-transform .4s 0s, visibility 0s 0s;
+	transition: transform .4s 0s, visibility 0s 0s;
+	/* smooth the scrolling on touch devices - webkit browsers */
+	-webkit-overflow-scrolling: touch;
+}
+
+/* style menu items which have a submenu  */
+.iv-lateral-nav .item-has-children>a {
+	background-color:rgb(8, 42,78); /* #3575B1;*/
+	border-bottom: 1px solid #c0c0c0;
+	font-size: 18.112px;
+}
+/*
+.iv-lateral-nav .item-has-children a:hover {
+    background-color: rgb( 10, 90, 154);
+}*/
+
+
+.item-has-children {
+	padding:0;
+}
+.item-has-children.curSection{
+	border-right: 5px solid #99CC00;
+	
+}
+.item-has-children.curSection .iv-section.collapsed{
+	opacity:0.6;	
+}
+.item-has-children.curSection .iv-section.collapsed:hover{
+	opacity:1;	
+}
+.item-has-children .iv-subsection{
+	margin-left:30px;
+	min-height:30px;
+	padding:10px 10px 10px 15px;
+	width: calc(100% - 30px);
+}
+.item-has-children .row:hover{
+	cursor:pointer;
+	background-color:#09468A;
+}
+.item-has-children .iv-subsection.active{
+	border-left: 5px solid #99CC00;
+	padding-left:10px;
+}
+
+
+.iv-lateral-nav .item-has-children {
+	position: relative;
+	font-weight: 600;
+	/*font-family: "HelveticaNeueW02-65Medi", "Helvetica Neue", Helvetica, Arial, sans-serif;*/
+	/* this is the right arrow to show that the item has a submenu  */
+}
+
+.cd-navigation .iv-search-input, .search-screen-input{
+	background-color:transparent;
+	
+	border:none;
+	border-bottom:1px solid gray;
+	margin:0 10px;
+	width:calc(100% - 20px);
+	height:50px;
+	font-size:16px;
+}
+ .cd-navigation .iv-search-input:focus, .search-screen-input:focus{
+outline: none;
+}
+
+.iv-lateral-nav .sub-menu li .iv-light {
+	margin-top:50%;
+	margin-bottom:50%;
+	width: 12px;
+	height: 12px;
+	webkit-border-radius: 6px;
+	-moz-border-radius: 6px;
+	border-radius:6px;
+	background-color:#717172  ;
+}
+
+.iv-lateral-nav .sub-menu li:hover .iv-light, .iv-lateral-nav .sub-menu .cur .iv-light{
+	background-color: #99CC00;
+}
+.iv-lateral-nav .iv-sub .row:hover{
+	background-color: #09468A;/*rgb(10, 90, 154);*/
+	cursor:pointer;
+}
+.iv-lateral-nav .item-has-children>a : :
+	after {
+	content: '';
+	display: block;
+	height: 11px;
+	width: 8px;
+	position: absolute;
+	top: 5px;
+	-webkit-transform: translateY(-50%);
+	-moz-transform: translateY(-50%);
+	-ms-transform: translateY(-50%);
+	-o-transform: translateY(-50%);
+	transform: translateY(-50%);
+	right: 1em;
+	background-size: 8px 11px;
+	-webkit-transition-property: -webkit-transform;
+	-moz-transition-property: -moz-transform;
+	transition-property: transform;
+	-webkit-transition-duration: 0.2s;
+	-moz-transition-duration: 0.2s;
+	transition-duration: 0.2s;
+}
+.iv-search-result:hover{
+	background-color:#09468A;
+}
+.iv-lateral-nav ul {
+	list-style-type: none;
+}
+.iv-lateral-nav .back-arrow{
+	margin-top:5px;
+}
+.iv-lateral-nav .back-arrow:hover{
+	cursor:pointer;
+}
+.iv-disabled-link:hover{
+	cursor:not-allowed;
+}
+#walkThroughToggle.active{
+	background-color: #3575B1;
+}
+.bubbleGuide .close{
+	opacity: 1;
+	color:black;
+}
+.bubbleGuide{
+	margin-top:5em;
+	width: 25em;
+	float:right;
+	display:block;
+	animation: fadein 3.5s;
+    -moz-animation: fadein 3.5s; /* Firefox */
+    -webkit-animation: fadein 3.5s; /* Safari and Chrome */
+    -o-animation: fadein 3.5s; /* Opera */
+}
+@keyframes fadein {
+    from {
+        opacity:0;
+    }
+    to {
+        opacity:1;
+    }
+}
+@-moz-keyframes fadein { /* Firefox */
+    from {
+        opacity:0;
+    }
+    to {
+        opacity:1;
+    }
+}
+@-webkit-keyframes fadein { /* Safari and Chrome */
+    from {
+        opacity:0;
+    }
+    to {
+        opacity:1;
+    }
+}
+@-o-keyframes fadein { /* Opera */
+    from {
+        opacity:0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+.navToggle{
+	height:20px;
+	display:inline-block;
+	cursor:pointer;
+}

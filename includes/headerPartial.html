@@ -1,0 +1,43 @@
+<div id="headerTemplate" class="header-nav headerTemplate"
+     ng-controller="naviController"
+     ng-class="{'lateral-menu-is-open':showNavMenu}">
+    <div class="iv-left pull-left">
+        <div id="navGuideMenus" ng-if="isLoggedin()"
+             class="menuTrigger pull-left iv-home-link" ng-click="toggleNavMenu()">
+            <!-- <a id="nav-toggle" ng-class="{'active': showNavMenu }" href="#"><span></span></a> -->
+            <img class="iv-menu" title="Menu" ng-src="assets/img/icons/menu.png"/>
+        </div>
+        <div ui-sref="spm" class="iv-home-link">
+		 	<span><img class='iv-logo pull-left' alt="United States Postal Service"
+                       ng-src="assets/img/icons/iv-logo.png"/>
+			</span> 
+			<span id="projectBranding" class="pull-left">
+                <div id="projectTitle">Informed Visibility</div>
+
+                <div id="projectSlogan">The single source for all your mail
+						visibility needs.</div>
+			</span>
+        </div>
+    </div>
+    <div class="pull-left slant"></div>
+    <div class="iv-left pull-left" style="padding:20px">
+        <div class="iv-home-nolink">
+            <span id="projectTitle2">Enterprise Analytics</span>
+        </div>
+    </div>
+
+    <div id="focusDummy" ng-if="isLoggedin()" class="iv-right pull-right">
+
+        <!--
+            <div ng-click = "logout()" class="logoutTrigger iv-home-link">
+            <span><img	class='iv-logo pull-right' alt="logout" title = "Logout"
+                    ng-src="assets/img/icons/logout-icon.png" />
+
+            </div>
+      -->
+    </div>
+    <div class=" nav-history iv-right pull-right">
+        <span class="glyphicon glyphicon-menu-left" title="Go Back" ng-click="goBack()"></span>
+        <span class="glyphicon glyphicon-menu-right" title="Go Forward" ng-click="goForward()"></span>
+    </div>
+</div>
