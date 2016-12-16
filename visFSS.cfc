@@ -89,6 +89,7 @@
 	<cfset aryData[++idx][1] = ReqId>
 	<cfreturn aryData>
 </cffunction>
+
 <!--- facility vis--->
 <cffunction name="getByFacilityFSS" access="remote" returntype="array">
 	<cfargument name="ReqId" type="string" required="yes">
@@ -339,6 +340,7 @@
 	<cfset aryData[++idx][1] = ReqId>
 	<cfreturn aryData>
 </cffunction>
+
 <!--- overall data vis--->
 <cffunction name="getOverall" access="remote" returntype="array">
 	<cfargument name="ReqId" type="string" required="yes">
@@ -429,6 +431,7 @@
 	<cfreturn aryData>
 </cffunction>
 
+<!--- getDates --->
 <cffunction name="getDates" access="remote" returntype="array">
 	<cfargument name="dsn" type="string" required="yes">
 	<cfargument name="range" type="string" required="yes">
@@ -519,6 +522,7 @@
 	</cfloop>        
 	<cfreturn ar>
 </cffunction>
+
 <!--- trend chart vis --->
 <cffunction name="getTrend" access="remote" returntype="array">
 <cfargument name="ReqId" type="string" required="yes">
